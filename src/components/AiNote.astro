@@ -1,0 +1,53 @@
+---
+/**
+ * "AI가 읽는 부분 보기"를 켰을 때만 보이는 설명 상자. 예시 사이트에서만 렌더링한다.
+ */
+import { aiNotes, type NoteKey } from '@/config/ai-notes';
+import { office } from '@/config/office';
+
+export interface Props {
+  note: NoteKey;
+}
+
+const { title, body } = aiNotes[Astro.props.note];
+---
+
+{
+  office.demo && (
+    <aside class="ai-note" data-ai-note>
+      <p class="ai-note__label">GeoDino 설명</p>
+      <p class="ai-note__title">{title}</p>
+      <p class="ai-note__body">{body}</p>
+      <slot />
+    </aside>
+  )
+}
+
+<style>
+  .ai-note {
+    display: none;
+    margin-block: var(--space-5);
+    padding: var(--space-4) var(--space-5);
+    border: 2px dashed var(--color-note-line);
+    border-radius: var(--radius);
+    background: var(--color-note-bg);
+    color: var(--color-ink);
+    font-size: var(--text-sm);
+  }
+
+  :global(html[data-ai-notes='on']) .ai-note {
+    display: block;
+  }
+
+  .ai-note__label {
+    color: var(--color-note);
+    font-size: 0.75rem;
+    font-weight: 700;
+  }
+
+  .ai-note__title {
+    margin-block: var(--space-1);
+    font-size: var(--text-base);
+    font-weight: 700;
+  }
+</style>

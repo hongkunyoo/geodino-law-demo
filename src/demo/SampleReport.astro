@@ -1,0 +1,291 @@
+---
+/**
+ * 무료 AI 노출 진단 요약(한 장) 예시. 가상 사무소 기준의 예시 화면이며 실제 AI 답변 기록이 아니다.
+ * 다른 사무소 이름은 가상 이름(△△·□□·◇◇)으로만 쓴다.
+ */
+import DemoPage from './DemoPage.astro';
+
+type Result = 'ok' | 'wrong' | 'none';
+
+const services = ['ChatGPT', 'Claude', 'Perplexity', 'Google AI 검색', 'Gemini'];
+
+const rows: { question: string; results: Result[]; instead: string }[] = [
+  {
+    question: '분당에서 이혼 소송 잘하는 변호사 추천해줘',
+    results: ['none', 'none', 'wrong', 'none', 'none'],
+    instead: '△△ 법률사무소, □□ 법무법인',
+  },
+  {
+    question: '분당 상속 변호사 추천해줘',
+    results: ['none', 'none', 'none', 'none', 'none'],
+    instead: '□□ 법무법인, ◇◇ 법률사무소',
+  },
+  {
+    question: '상속포기는 언제까지 해야 해? 분당에서 상담할 곳도 알려줘',
+    results: ['none', 'none', 'none', 'none', 'none'],
+    instead: '◇◇ 법률사무소',
+  },
+  {
+    question: '분당 이혼 소송 변호사 비용은 얼마야?',
+    results: ['none', 'none', 'none', 'none', 'none'],
+    instead: '△△ 법률사무소',
+  },
+  {
+    question: '○○ 법률사무소는 어떤 곳이야?',
+    results: ['wrong', 'ok', 'wrong', 'wrong', 'none'],
+    instead: '—',
+  },
+];
+
+const label: Record<Result, string> = { ok: '정확', wrong: '부정확', none: '없음' };
+const all = rows.flatMap((row) => row.results);
+const mentioned = all.filter((result) => result !== 'none').length;
+const accurate = all.filter((result) => result === 'ok').length;
+
+const findings = [
+  '추천 질문 4개(20번)에서 사무소가 언급된 것은 1번뿐이었고, 그마저 예전 주소로 소개됐습니다.',
+  '사무소 이름으로 직접 물었을 때 3곳이 "이혼 사건만 하는 곳"으로 설명했습니다. 상속 업무는 빠졌습니다.',
+  '예전 주소는 2019년 블로그 글에서 인용됐습니다. 지금 주소와 상담 시간은 어디에도 한곳에 정리되어 있지 않았습니다.',
+  '대신 소개된 사무소들은 분야별 절차·비용 기준을 정리한 안내 페이지가 있었고, AI가 그 페이지를 출처로 인용했습니다.',
+];
+
+const conditions = [
+  { name: '찾기 쉬움', status: '부족', note: '공식 사이트가 없고 블로그 글만 있어, 분야·지역 질문에서 잡히는 페이지가 없습니다.' },
+  { name: '답으로 쓰기 좋음', status: '부족', note: '절차·기간·비용 기준이 글 곳곳에 흩어져 있어 답으로 쓰기 어렵습니다.' },
+  { name: '믿을 수 있음', status: '일부', note: '블로그와 지도 서비스의 주소·상담 시간이 서로 다릅니다.' },
+];
+
+const prescriptions = [
+  { title: '공식 안내 페이지 만들기', body: '주력 분야, 지역, 변호사, 비용 기준, 절차를 한곳에 모읍니다. 블로그는 그대로 두고 연결합니다.', href: '/' },
+  { title: '분야별 안내와 FAQ', body: '이혼·상속 각각의 절차, 준비할 것, 기간과 의뢰인이 묻는 질문의 답을 정리합니다.' },
+  { title: '정보가 같은지 확인', body: '블로그와 지도 서비스에 적힌 주소·상담 시간이 공식 안내 페이지와 같은지 확인합니다.' },
+];
+---
+
+<DemoPage
+  title="AI 노출 진단 요약"
+  eyebrow="무료 AI 노출 진단 결과물 예시"
+  description="가상 법률사무소를 기준으로 만든 GeoDino 무료 AI 노출 진단 요약 예시입니다."
+>
+  <dl class="meta card">
+    <div><dt>대상</dt><dd>○○ 법률사무소 (가상) · 성남 분당 · 이혼·상속</dd></div>
+    <div><dt>방법</dt><dd>의뢰인이 물을 법한 질문 {rows.length}개를 AI 서비스 {services.length}곳에 그대로 물어봤습니다</dd></div>
+  </dl>
+
+  <div class="numbers">
+    <div class="number card"><strong>{all.length}번</strong><span>물어봤습니다</span></div>
+    <div class="number card"><strong>{mentioned}번</strong><span>사무소가 언급됐습니다</span></div>
+    <div class="number card"><strong>{accurate}번</strong><span>정확하게 설명됐습니다</span></div>
+  </div>
+
+  <h2>질문별 결과</h2>
+  <p class="legend muted">
+    <span class="mark mark--ok">정확</span> 언급되고 정확함 · <span class="mark mark--wrong">부정확</span> 언급됐지만 틀린 정보 ·
+    <span class="mark mark--none">없음</span> 언급 없음
+  </p>
+  <div class="results">
+    {
+      rows.map((row) => (
+        <article class="result card">
+          <h3>"{row.question}"</h3>
+          <ul class="result__grid">
+            {row.results.map((result, index) => (
+              <li>
+                <span class="result__service">{services[index]}</span>
+                <span class={`mark mark--${result}`}>{label[result]}</span>
+              </li>
+            ))}
+          </ul>
+          <p class="result__instead">
+            <span class="muted">대신 소개된 곳</span> {row.instead}
+          </p>
+        </article>
+      ))
+    }
+  </div>
+
+  <h2>발견한 점</h2>
+  <ul class="findings">{findings.map((item) => <li>{item}</li>)}</ul>
+
+  <h2>막힌 곳</h2>
+  <div class="conditions">
+    {
+      conditions.map((condition) => (
+        <div class="card condition">
+          <p class="condition__head">
+            <strong>{condition.name}</strong>
+            <span class:list={['condition__status', condition.status === '부족' && 'condition__status--bad']}>
+              {condition.status}
+            </span>
+          </p>
+          <p class="muted">{condition.note}</p>
+        </div>
+      ))
+    }
+  </div>
+
+  <h2>이렇게 정리합니다 (필요한 것만)</h2>
+  <ol class="prescriptions">
+    {
+      prescriptions.map((item) => (
+        <li class="card">
+          <strong>{item.title}</strong>
+          <p class="muted">{item.body}</p>
+          {item.href && <a href={item.href}>완성 예시 보기 →</a>}
+        </li>
+      ))
+    }
+  </ol>
+  <p class="muted">블로그 글을 대량으로 쓰거나 블로그를 옮기는 일은 하지 않습니다.</p>
+
+  <h2>3개월 뒤</h2>
+  <p>같은 {rows.length}개 질문을 같은 {services.length}곳에 다시 물어보고, 이 표와 나란히 비교해 무엇이 달라졌는지 보여 드립니다.</p>
+</DemoPage>
+
+<style>
+  .meta {
+    display: grid;
+    gap: var(--space-2);
+  }
+
+  .meta > div {
+    display: grid;
+    grid-template-columns: 3.5em 1fr;
+    gap: var(--space-3);
+  }
+
+  .meta dt {
+    color: var(--color-ink-muted);
+    font-weight: 600;
+  }
+
+  .numbers {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--space-3);
+    margin-top: var(--space-4);
+  }
+
+  .number {
+    display: grid;
+    min-width: 0;
+    padding: var(--space-4) var(--space-2);
+    text-align: center;
+  }
+
+  .number strong {
+    color: var(--color-note);
+    font-size: var(--text-2xl);
+  }
+
+  .number span {
+    color: var(--color-ink-muted);
+    font-size: var(--text-sm);
+  }
+
+  .legend {
+    margin-bottom: var(--space-4);
+    font-size: var(--text-sm);
+  }
+
+  .results {
+    display: grid;
+    gap: var(--space-4);
+  }
+
+  .result h3 {
+    margin-bottom: var(--space-3);
+    font-size: var(--text-base);
+  }
+
+  .result__grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+    gap: var(--space-2);
+    padding: 0;
+    list-style: none;
+  }
+
+  .result__grid li {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-2);
+    padding: var(--space-2) var(--space-3);
+    border-radius: 8px;
+    background: var(--color-surface);
+    font-size: var(--text-sm);
+  }
+
+  .result__instead {
+    margin-top: var(--space-3);
+    font-size: var(--text-sm);
+  }
+
+  .mark {
+    display: inline-block;
+    padding: 0 8px;
+    border-radius: 999px;
+    font-size: 0.75rem;
+    font-weight: 700;
+  }
+
+  .mark--ok {
+    background: #ddf2e3;
+    color: #125a31;
+  }
+
+  .mark--wrong {
+    background: #fde8d7;
+    color: #8a3a00;
+  }
+
+  .mark--none {
+    background: #e9eaec;
+    color: #4a4e55;
+  }
+
+  .findings {
+    display: grid;
+    gap: var(--space-2);
+  }
+
+  .conditions {
+    display: grid;
+    gap: var(--space-3);
+  }
+
+  @media (min-width: 768px) {
+    .conditions {
+      grid-template-columns: repeat(3, 1fr);
+    }
+  }
+
+  .condition__head {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: var(--space-2);
+  }
+
+  .condition__status {
+    padding: 0 10px;
+    border-radius: 999px;
+    background: #fff4d6;
+    color: #6b4e00;
+    font-size: var(--text-sm);
+    font-weight: 700;
+  }
+
+  .condition__status--bad {
+    background: #fde8d7;
+    color: #8a3a00;
+  }
+
+  .prescriptions {
+    display: grid;
+    gap: var(--space-3);
+    margin-bottom: var(--space-3);
+    padding: 0;
+    list-style: none;
+  }
+</style>

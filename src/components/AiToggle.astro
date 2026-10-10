@@ -1,0 +1,82 @@
+---
+/**
+ * "AI가 읽는 부분 보기" 스위치 (예시 사이트 전용). 주소에 ?ai=1 을 붙이면 켜진 상태로 열린다.
+ */
+---
+
+<button class="ai-toggle" type="button" aria-pressed="false" data-ai-toggle>
+  <span class="ai-toggle__switch" aria-hidden="true"></span>
+  AI가 읽는 부분 보기
+</button>
+
+<script>
+  const root = document.documentElement;
+  const button = document.querySelector<HTMLButtonElement>('[data-ai-toggle]');
+
+  function apply(on: boolean) {
+    root.dataset.aiNotes = on ? 'on' : 'off';
+    button?.setAttribute('aria-pressed', String(on));
+  }
+
+  apply(new URLSearchParams(location.search).get('ai') === '1');
+
+  button?.addEventListener('click', () => {
+    const on = root.dataset.aiNotes !== 'on';
+    apply(on);
+    const url = new URL(location.href);
+    if (on) url.searchParams.set('ai', '1');
+    else url.searchParams.delete('ai');
+    history.replaceState(null, '', url);
+  });
+</script>
+
+<style>
+  .ai-toggle {
+    position: fixed;
+    bottom: max(16px, env(safe-area-inset-bottom));
+    left: 50%;
+    z-index: 50;
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    padding: 12px 20px;
+    transform: translateX(-50%);
+    border: 0;
+    border-radius: 999px;
+    background: var(--color-note);
+    box-shadow: 0 6px 20px rgb(0 0 0 / 0.2);
+    color: #fff;
+    font-weight: 700;
+    white-space: nowrap;
+    cursor: pointer;
+  }
+
+  .ai-toggle__switch {
+    position: relative;
+    width: 36px;
+    height: 20px;
+    border-radius: 999px;
+    background: rgb(255 255 255 / 0.35);
+    transition: background 150ms ease;
+  }
+
+  .ai-toggle__switch::after {
+    content: '';
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: #fff;
+    transition: transform 150ms ease;
+  }
+
+  .ai-toggle[aria-pressed='true'] .ai-toggle__switch {
+    background: #6cc486;
+  }
+
+  .ai-toggle[aria-pressed='true'] .ai-toggle__switch::after {
+    transform: translateX(16px);
+  }
+</style>

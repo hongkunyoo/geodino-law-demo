@@ -1,0 +1,193 @@
+---
+/**
+ * 정리 전·후 비교 예시. 가상 사무소 기준이며 실제 사례가 아니다.
+ */
+import DemoPage from './DemoPage.astro';
+
+const rows = [
+  {
+    topic: '주력 분야',
+    before: '이혼 사건 글이 많아서, 상속 업무는 블로그 몇 개 글에만 보입니다.',
+    after: '이혼·가사, 상속 두 분야를 첫 문단과 분야별 안내에 함께 적었습니다.',
+  },
+  {
+    topic: '주소·상담 시간',
+    before: '2019년 글에는 예전 주소, 지도 서비스에는 지금 주소. 상담 시간은 글마다 다릅니다.',
+    after: '공식 안내 페이지 한 곳에 지금 주소와 상담 시간을 적고, 다른 채널이 같은지 확인합니다.',
+  },
+  {
+    topic: '비용',
+    before: '어디에도 없습니다. 의뢰인은 전화로 물어봐야 합니다.',
+    after: '상담료와, 수임료가 정해지는 기준을 적었습니다. 금액을 약속하지는 않습니다.',
+  },
+  {
+    topic: '절차·기간',
+    before: '사건 후기 글 속에 섞여 있어 처음부터 끝까지 읽어야 알 수 있습니다.',
+    after: '분야마다 진행 절차, 준비할 것, 걸리는 기간을 따로 정리했습니다.',
+  },
+  {
+    topic: '변호사 정보',
+    before: '블로그 프로필에 한 줄. 사무소 이름과 따로 떨어져 있습니다.',
+    after: '변호사 소개와 경력을 사무소 정보와 같은 페이지에, 이름표로도 연결했습니다.',
+  },
+  {
+    topic: '채널 연결',
+    before: '블로그, 지도 서비스, 영상 채널이 서로 같은 사무소라는 표시가 없습니다.',
+    after: '공식 안내 페이지에서 세 채널을 잇고, 이름표(sameAs)로 같은 사무소라고 알립니다.',
+  },
+];
+---
+
+<DemoPage
+  title="정리 전·후 비교"
+  eyebrow="공식 안내 페이지를 만들면 무엇이 달라지나요"
+  description="가상 법률사무소를 기준으로, 흩어진 정보가 공식 안내 페이지 한 곳으로 정리되는 모습을 비교한 예시입니다."
+>
+  <div class="summary">
+    <div class="card summary__side">
+      <p class="summary__label">정리 전</p>
+      <p class="summary__ai">AI가 이해한 사무소</p>
+      <p class="summary__quote">"분당의 이혼 사건 블로그를 운영하는 변호사. 주소는 (예전 주소)."</p>
+    </div>
+    <div class="card summary__side summary__side--after">
+      <p class="summary__label">정리 후 (목표)</p>
+      <p class="summary__ai">AI가 이해하기를 바라는 사무소</p>
+      <p class="summary__quote">"성남 분당 정자동, 이혼·가사와 상속 주력, 김○○ 변호사. 예약제로 방문·전화·화상 상담."</p>
+    </div>
+  </div>
+  <p class="muted note">정리 후 문장은 목표입니다. AI 답변은 서비스마다 다르고, 실제로 어떻게 바뀌었는지는 3개월 뒤 같은 질문으로 확인합니다.</p>
+
+  <h2>항목별 비교</h2>
+  <div class="table">
+    <div class="table__head" aria-hidden="true">
+      <span>항목</span><span>정리 전</span><span>정리 후</span>
+    </div>
+    {
+      rows.map((row) => (
+        <div class="table__row">
+          <p class="table__topic">{row.topic}</p>
+          <p class="table__before"><span class="table__tag">정리 전</span>{row.before}</p>
+          <p class="table__after"><span class="table__tag">정리 후</span>{row.after}</p>
+        </div>
+      ))
+    }
+  </div>
+
+  <h2>블로그는 그대로 둡니다</h2>
+  <p>
+    블로그와 지도 서비스는 의뢰인이 찾아오는 중요한 채널입니다. 공식 안내 페이지는 그 채널들을 대체하지 않고, 흩어진 정보를
+    한곳에 모아 연결하는 허브입니다.
+  </p>
+  <p><a href="/">완성된 공식 안내 페이지 예시 보기 →</a></p>
+</DemoPage>
+
+<style>
+  .summary {
+    display: grid;
+    gap: var(--space-3);
+  }
+
+  @media (min-width: 768px) {
+    .summary {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+
+  .summary__side {
+    border-top: 4px solid #c9ccd1;
+  }
+
+  .summary__side--after {
+    border-top-color: var(--color-note);
+  }
+
+  .summary__label {
+    font-weight: 800;
+  }
+
+  .summary__ai {
+    color: var(--color-ink-muted);
+    font-size: var(--text-sm);
+  }
+
+  .summary__quote {
+    margin-top: var(--space-3);
+    font-size: var(--text-lg);
+    font-weight: 600;
+  }
+
+  .note {
+    margin-top: var(--space-3);
+    font-size: var(--text-sm);
+  }
+
+  .table {
+    border: 1px solid var(--color-line);
+    border-radius: var(--radius);
+    overflow: hidden;
+    background: #fff;
+  }
+
+  .table__head {
+    display: none;
+  }
+
+  .table__row {
+    display: grid;
+    gap: var(--space-2);
+    padding: var(--space-4);
+    border-top: 1px solid var(--color-line);
+  }
+
+  .table__row:first-of-type {
+    border-top: 0;
+  }
+
+  .table__topic {
+    font-weight: 800;
+  }
+
+  .table__before {
+    color: var(--color-ink-muted);
+  }
+
+  .table__tag {
+    display: inline-block;
+    margin-right: var(--space-2);
+    padding: 0 8px;
+    border-radius: 999px;
+    background: #e9eaec;
+    color: #4a4e55;
+    font-size: 0.75rem;
+    font-weight: 700;
+  }
+
+  .table__after .table__tag {
+    background: var(--color-note-bg);
+    color: var(--color-note);
+  }
+
+  @media (min-width: 768px) {
+    .table__head,
+    .table__row {
+      display: grid;
+      grid-template-columns: 8em 1fr 1fr;
+      gap: var(--space-5);
+    }
+
+    .table__head {
+      padding: var(--space-3) var(--space-4);
+      background: var(--color-surface);
+      font-size: var(--text-sm);
+      font-weight: 700;
+    }
+
+    .table__row:first-of-type {
+      border-top: 1px solid var(--color-line);
+    }
+
+    .table__tag {
+      display: none;
+    }
+  }
+</style>

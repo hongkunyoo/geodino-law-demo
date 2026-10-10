@@ -1,0 +1,17 @@
+---
+/**
+ * 영업용 예시 자료 페이지. office.demo가 true일 때만 만들어진다 (실제 고객 사이트에는 생기지 않음).
+ */
+import { office } from '@/config/office';
+import BeforeAfter from '@/demo/BeforeAfter.astro';
+import SampleReport from '@/demo/SampleReport.astro';
+
+export function getStaticPaths() {
+  if (!office.demo) return [];
+  return [{ params: { demo: 'sample-report' } }, { params: { demo: 'before-after' } }];
+}
+
+const { demo } = Astro.params;
+---
+
+{demo === 'sample-report' ? <SampleReport /> : <BeforeAfter />}

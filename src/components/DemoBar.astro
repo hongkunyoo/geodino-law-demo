@@ -1,0 +1,63 @@
+---
+/**
+ * 예시 사이트 표시 띠 (demo: true일 때만). 모든 페이지 맨 위에 둔다.
+ */
+const links = [
+  { href: '/', label: '예시 사이트' },
+  { href: '/sample-report/', label: '진단 요약 예시' },
+  { href: '/before-after/', label: '정리 전·후' },
+];
+const current = Astro.url.pathname;
+---
+
+<div class="demo-bar" role="note" aria-label="예시 사이트 안내">
+  <div class="container demo-bar__inner">
+    <p class="demo-bar__text">
+      <strong>예시 사이트</strong>입니다. 실제 법률사무소가 아니며, 이름·주소·연락처는 모두 가상입니다.
+    </p>
+    <nav class="demo-bar__nav" aria-label="예시 자료">
+      {
+        links.map((link) => (
+          <a href={link.href} aria-current={current === link.href ? 'page' : undefined}>
+            {link.label}
+          </a>
+        ))
+      }
+      <a href="https://geodino.io/industries/lawyer/">GeoDino ↗</a>
+    </nav>
+  </div>
+</div>
+
+<style>
+  .demo-bar {
+    background: var(--color-note);
+    color: #fff;
+    font-size: var(--text-sm);
+  }
+
+  .demo-bar__inner {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-1) var(--space-4);
+    padding-block: var(--space-2);
+  }
+
+  .demo-bar__nav {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-1) var(--space-3);
+  }
+
+  .demo-bar a {
+    color: #fff;
+    opacity: 0.85;
+  }
+
+  .demo-bar a[aria-current='page'] {
+    font-weight: 700;
+    opacity: 1;
+    text-decoration-thickness: 2px;
+  }
+</style>

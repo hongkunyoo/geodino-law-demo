@@ -1,0 +1,44 @@
+---
+import 'pretendard/dist/web/variable/pretendardvariable-dynamic-subset.css';
+import '@/styles/global.css';
+
+import DemoBar from '@/components/DemoBar.astro';
+import { office } from '@/config/office';
+
+export interface Props {
+  title: string;
+  description: string;
+  schema?: Record<string, unknown>[];
+}
+
+const { title, description, schema = [] } = Astro.props;
+const canonical = new URL(Astro.url.pathname, office.siteUrl).href;
+const themeStyle = `--color-primary:${office.theme.primary};--color-primary-hover:${office.theme.primaryHover};--color-accent:${office.theme.accent}`;
+---
+
+<!doctype html>
+<html lang="ko" style={themeStyle}>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonical} />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    {
+      /* 가상 사무소가 실제 사무소처럼 검색·AI 답변에 나오지 않도록 예시 사이트는 색인하지 않는다 */
+      office.demo && <meta name="robots" content="noindex, nofollow" />
+    }
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:locale" content="ko_KR" />
+    {schema.map((item) => <script type="application/ld+json" set:html={JSON.stringify(item)} />)}
+  </head>
+  <body>
+    <a class="skip-link" href="#main">본문으로 건너뛰기</a>
+    {office.demo && <DemoBar />}
+    <slot />
+  </body>
+</html>

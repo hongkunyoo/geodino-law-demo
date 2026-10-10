@@ -1,0 +1,648 @@
+---
+/**
+ * 사무소 공식 안내 페이지. 여러 페이지짜리 홈페이지가 아니라, 흩어진 정보를 한곳에 모은 한 페이지다.
+ * 순서: 한눈에 → 변호사 → 분야별 안내 → 비용·상담 → FAQ → 오시는 길·채널
+ */
+import AiNote from '@/components/AiNote.astro';
+import AiToggle from '@/components/AiToggle.astro';
+import { office } from '@/config/office';
+import Layout from '@/layouts/Layout.astro';
+import { faqSchema, legalServiceSchema } from '@/lib/schema';
+
+const { contact, lawyer, practiceAreas, fees, faqs, channels, legal } = office;
+const focus = office.focusAreas.join('·');
+const schema = [legalServiceSchema(office), faqSchema(faqs)];
+
+const title = `${office.name} | 분당 ${focus} 변호사`;
+const description = `성남 분당 정자동 ${office.name}. 김○○ 변호사가 ${focus} 사건을 주로 맡습니다. 절차·비용 기준·상담 안내.`;
+
+const nav = [
+  { href: '#areas', label: '주력 분야' },
+  { href: '#consult', label: '비용·상담' },
+  { href: '#faq', label: '자주 묻는 질문' },
+  { href: '#location', label: '오시는 길' },
+];
+const updated = office.updatedAt.replaceAll('-', '.');
+---
+
+<Layout title={title} description={description} schema={schema}>
+  <header class="site-header">
+    <div class="container site-header__inner">
+      <a class="site-header__name" href="/">{office.name}</a>
+      <nav aria-label="페이지 안 메뉴">
+        <ul class="site-header__nav">
+          {nav.map((item) => <li><a href={item.href}>{item.label}</a></li>)}
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <main id="main">
+    <!-- 한눈에 -->
+    <section class="section hero" aria-labelledby="hero-title">
+      <div class="container">
+        <p class="hero__eyebrow">성남 분당 · {office.focusAreas.join(', ')} 주력</p>
+        <h1 id="hero-title">분당에서 {focus} 사건을 주로 맡는 {office.name}</h1>
+        <p class="hero__summary">{office.summary}</p>
+        <AiNote note="summary" />
+
+        <dl class="facts">
+          <div><dt>주력 분야</dt><dd>{office.focusAreas.join(', ')}</dd></div>
+          <div><dt>위치</dt><dd>{contact.address}</dd></div>
+          <div><dt>변호사</dt><dd>{lawyer.role} {lawyer.name}</dd></div>
+          <div><dt>상담 방법</dt><dd>예약제 · {contact.consultMethods.join(', ')}</dd></div>
+          <div><dt>상담 시간</dt><dd>{contact.hours.map((h) => `${h.label} ${h.value}`).join(' / ')}</dd></div>
+          <div>
+            <dt>전화</dt>
+            <dd>{contact.phone}{office.demo && <span class="example-tag">예시 번호</span>}</dd>
+          </div>
+        </dl>
+
+        <div class="hero__actions">
+          <a class="button" href="#consult">상담 예약 안내 보기</a>
+          <a class="button button--ghost" href="#areas">분야별 안내 보기</a>
+        </div>
+      </div>
+    </section>
+
+    <!-- 변호사 -->
+    <section class="section" aria-labelledby="lawyer-title">
+      <div class="container lawyer">
+        <div class="lawyer__portrait" aria-hidden="true">
+          <span>{lawyer.name.slice(0, 1)}</span>
+        </div>
+        <div>
+          <h2 id="lawyer-title" class="section__title">{lawyer.role} {lawyer.name}</h2>
+          <p>{lawyer.message}</p>
+          <h3 class="lawyer__career-title">경력{office.demo && <span class="example-tag">가상 경력</span>}</h3>
+          <ul class="lawyer__career">
+            {lawyer.career.map((item) => <li>{item}</li>)}
+          </ul>
+          <p class="muted lawyer__focus">주력 분야: {office.focusAreas.join(', ')}</p>
+          <AiNote note="lawyer" />
+        </div>
+      </div>
+    </section>
+
+    <!-- 분야별 안내 -->
+    <section class="section" id="areas" aria-labelledby="areas-title">
+      <div class="container">
+        <h2 id="areas-title" class="section__title">주력 분야별 안내</h2>
+        <p class="section__lead">사건마다 진행 절차와 준비할 것, 걸리는 기간을 정리했습니다. 일반적인 안내이며 사건마다 다를 수 있습니다.</p>
+        <AiNote note="areas" />
+
+        <div class="areas">
+          {
+            practiceAreas.map((area) => (
+              <article class="area" id={area.id} aria-labelledby={`${area.id}-title`}>
+                <h3 id={`${area.id}-title`} class="area__name">{area.name}</h3>
+                <p class="area__summary">{area.summary}</p>
+
+                <h4>진행 절차</h4>
+                <ol class="steps">
+                  {area.steps.map((step) => (
+                    <li>
+                      <strong>{step.title}</strong>
+                      <span>{step.description}</span>
+                    </li>
+                  ))}
+                </ol>
+
+                <h4>준비할 것</h4>
+                <ul>
+                  {area.prepare.map((item) => (
+                    <li>{item}</li>
+                  ))}
+                </ul>
+
+                <h4>걸리는 기간</h4>
+                <p>{area.timeline}</p>
+              </article>
+            ))
+          }
+        </div>
+      </div>
+    </section>
+
+    <!-- 비용·상담 -->
+    <section class="section" id="consult" aria-labelledby="consult-title">
+      <div class="container">
+        <h2 id="consult-title" class="section__title">비용과 상담 절차</h2>
+        <AiNote note="fees" />
+        <div class="fees">
+          <div class="fees__item">
+            <h3>상담 비용{office.demo && <span class="example-tag">예시 금액</span>}</h3>
+            <p>{fees.consultation}</p>
+          </div>
+          <div class="fees__item">
+            <h3>수임료</h3>
+            <p>{fees.retainer}</p>
+          </div>
+        </div>
+
+        <h3 class="consult__steps-title">상담은 이렇게 진행됩니다</h3>
+        <ol class="flow">
+          {
+            fees.steps.map((step, index) => (
+              <li class="flow__item">
+                <span class="flow__number" aria-hidden="true">{index + 1}</span>
+                <strong>{step.title}</strong>
+                <span>{step.description}</span>
+              </li>
+            ))
+          }
+        </ol>
+
+        <div class="consult__contact">
+          <p>
+            상담 예약: <strong>{contact.phone}</strong>{office.demo && <span class="example-tag">예시 번호</span>}
+          </p>
+          <p class="muted">{contact.hours.map((h) => `${h.label} ${h.value}`).join(' · ')}</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- FAQ -->
+    <section class="section" id="faq" aria-labelledby="faq-title">
+      <div class="container">
+        <h2 id="faq-title" class="section__title">자주 묻는 질문</h2>
+        <AiNote note="faq" />
+        <div class="faq">
+          {
+            faqs.map((faq) => (
+              <details class="faq__item">
+                <summary>{faq.question}</summary>
+                <div class="faq__answer">
+                  {faq.answer.map((paragraph) => (
+                    <p>{paragraph}</p>
+                  ))}
+                </div>
+              </details>
+            ))
+          }
+        </div>
+      </div>
+    </section>
+
+    <!-- 오시는 길·채널 -->
+    <section class="section" id="location" aria-labelledby="location-title">
+      <div class="container location">
+        <div>
+          <h2 id="location-title" class="section__title">오시는 길</h2>
+          <p class="location__address">
+            {contact.address}{office.demo && <span class="example-tag">가상 주소</span>}
+          </p>
+          <ul>
+            {contact.directions.map((item) => <li>{item}</li>)}
+          </ul>
+        </div>
+        <div>
+          <h2 class="section__title">사무소 채널</h2>
+          <ul class="channels">
+            {
+              channels.map((channel) => (
+                <li>
+                  {office.demo ? (
+                    <span class="channel">
+                      <strong>{channel.name}</strong>
+                      <span class="muted">{channel.purpose}</span>
+                      <span class="example-tag">예시 링크</span>
+                    </span>
+                  ) : (
+                    <a class="channel" href={channel.url} rel="me">
+                      <strong>{channel.name}</strong>
+                      <span class="muted">{channel.purpose}</span>
+                    </a>
+                  )}
+                </li>
+              ))
+            }
+          </ul>
+        </div>
+      </div>
+      <div class="container"><AiNote note="channels" /></div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container">
+      <p class="site-footer__name">{office.name}</p>
+      <dl class="site-footer__info">
+        <div><dt>대표 변호사</dt><dd>{lawyer.name}</dd></div>
+        <div><dt>광고책임변호사</dt><dd>{legal.responsibleLawyer}</dd></div>
+        <div><dt>주소</dt><dd>{contact.address}</dd></div>
+        <div><dt>전화</dt><dd>{contact.phone}</dd></div>
+        <div><dt>사업자등록번호</dt><dd>{legal.businessNumber}</dd></div>
+        <div><dt>최종 수정일</dt><dd><time datetime={office.updatedAt}>{updated}</time></dd></div>
+      </dl>
+      <p class="site-footer__disclaimer">{legal.disclaimer}</p>
+      <AiNote note="footer">
+        <details class="schema-view">
+          <summary>이 페이지의 이름표(구조화 데이터) 보기</summary>
+          <pre><code>{JSON.stringify(schema, null, 2)}</code></pre>
+        </details>
+      </AiNote>
+    </div>
+  </footer>
+
+  {office.demo && <AiToggle />}
+</Layout>
+
+<style>
+  .site-header {
+    position: sticky;
+    top: 0;
+    z-index: 40;
+    border-bottom: 1px solid var(--color-line);
+    background: rgb(255 255 255 / 0.96);
+  }
+
+  .site-header__inner {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-1) var(--space-5);
+    padding-block: var(--space-3);
+  }
+
+  .site-header__name {
+    color: var(--color-primary);
+    font-size: var(--text-lg);
+    font-weight: 800;
+    text-decoration: none;
+  }
+
+  .site-header__nav {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-1) var(--space-4);
+    padding: 0;
+    list-style: none;
+    font-size: var(--text-sm);
+  }
+
+  .site-header__nav a {
+    color: var(--color-ink);
+    text-decoration: none;
+  }
+
+  .site-header__nav a:hover {
+    color: var(--color-primary);
+  }
+
+  .hero {
+    border-top: 4px solid var(--color-accent);
+  }
+
+  .hero__eyebrow {
+    margin-bottom: var(--space-2);
+    color: var(--color-accent);
+    font-weight: 700;
+  }
+
+  .hero h1 {
+    max-width: 18em;
+    color: var(--color-primary);
+  }
+
+  .hero__summary {
+    max-width: 720px;
+    margin-top: var(--space-4);
+    font-size: var(--text-lg);
+  }
+
+  .facts {
+    display: grid;
+    gap: 0;
+    margin-top: var(--space-6);
+    border: 1px solid var(--color-line);
+    border-radius: var(--radius);
+    overflow: hidden;
+  }
+
+  .facts > div {
+    display: grid;
+    grid-template-columns: 6.5em 1fr;
+    gap: var(--space-3);
+    padding: var(--space-3) var(--space-4);
+    border-bottom: 1px solid var(--color-line);
+  }
+
+  .facts > div:last-child {
+    border-bottom: 0;
+  }
+
+  .facts dt {
+    color: var(--color-ink-muted);
+    font-weight: 600;
+  }
+
+  @media (min-width: 768px) {
+    .facts {
+      grid-template-columns: 1fr 1fr;
+    }
+
+    .facts > div:nth-child(odd) {
+      border-right: 1px solid var(--color-line);
+    }
+
+    .facts > div:nth-last-child(2) {
+      border-bottom: 0;
+    }
+  }
+
+  .hero__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-3);
+    margin-top: var(--space-6);
+  }
+
+  .button {
+    display: inline-block;
+    padding: 12px 24px;
+    border: 2px solid var(--color-primary);
+    border-radius: var(--radius);
+    background: var(--color-primary);
+    color: var(--color-on-primary);
+    font-weight: 700;
+    text-decoration: none;
+  }
+
+  .button:hover {
+    background: var(--color-primary-hover);
+  }
+
+  .button--ghost {
+    background: transparent;
+    color: var(--color-primary);
+  }
+
+  .button--ghost:hover {
+    background: var(--color-surface);
+  }
+
+  .lawyer {
+    display: grid;
+    gap: var(--space-6);
+  }
+
+  .lawyer__portrait {
+    display: grid;
+    place-items: center;
+    width: 160px;
+    aspect-ratio: 3 / 4;
+    border-radius: var(--radius);
+    background: var(--color-primary);
+    color: #fff;
+    font-size: 3rem;
+    font-weight: 800;
+  }
+
+  @media (min-width: 768px) {
+    .lawyer {
+      grid-template-columns: 200px 1fr;
+    }
+
+    .lawyer__portrait {
+      width: 100%;
+    }
+  }
+
+  .lawyer__career-title {
+    margin-top: var(--space-5);
+    margin-bottom: var(--space-2);
+    font-size: var(--text-base);
+  }
+
+  .lawyer__focus {
+    margin-top: var(--space-3);
+  }
+
+  .areas {
+    display: grid;
+    gap: var(--space-5);
+  }
+
+  @media (min-width: 900px) {
+    .areas {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+
+  .area {
+    padding: var(--space-5);
+    border: 1px solid var(--color-line);
+    border-top: 4px solid var(--color-primary);
+    border-radius: var(--radius);
+    background: #fff;
+  }
+
+  .area__name {
+    color: var(--color-primary);
+    font-size: var(--text-xl);
+  }
+
+  .area__summary {
+    margin-top: var(--space-2);
+  }
+
+  .area h4 {
+    margin-top: var(--space-5);
+    margin-bottom: var(--space-2);
+    font-size: var(--text-base);
+  }
+
+  .steps {
+    display: grid;
+    gap: var(--space-2);
+  }
+
+  .steps strong {
+    margin-right: var(--space-2);
+  }
+
+  .fees {
+    display: grid;
+    gap: var(--space-4);
+  }
+
+  @media (min-width: 768px) {
+    .fees {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+
+  .fees__item {
+    padding: var(--space-5);
+    border: 1px solid var(--color-line);
+    border-radius: var(--radius);
+    background: #fff;
+  }
+
+  .fees__item h3 {
+    margin-bottom: var(--space-2);
+  }
+
+  .consult__steps-title {
+    margin-top: var(--space-7);
+    margin-bottom: var(--space-4);
+  }
+
+  .flow {
+    display: grid;
+    gap: var(--space-3);
+    padding: 0;
+    list-style: none;
+  }
+
+  @media (min-width: 768px) {
+    .flow {
+      grid-template-columns: repeat(4, 1fr);
+    }
+  }
+
+  .flow__item {
+    display: grid;
+    gap: var(--space-1);
+    padding: var(--space-4);
+    border: 1px solid var(--color-line);
+    border-radius: var(--radius);
+    background: #fff;
+  }
+
+  .flow__number {
+    display: grid;
+    place-items: center;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: var(--color-primary);
+    color: #fff;
+    font-size: var(--text-sm);
+    font-weight: 700;
+  }
+
+  .flow__item span:last-child {
+    color: var(--color-ink-muted);
+    font-size: var(--text-sm);
+  }
+
+  .consult__contact {
+    margin-top: var(--space-6);
+    padding: var(--space-5);
+    border-left: 4px solid var(--color-accent);
+    background: #fff;
+  }
+
+  .faq {
+    display: grid;
+    gap: var(--space-3);
+  }
+
+  .faq__item {
+    border: 1px solid var(--color-line);
+    border-radius: var(--radius);
+    background: #fff;
+  }
+
+  .faq__item summary {
+    padding: var(--space-4) var(--space-5);
+    font-weight: 700;
+    cursor: pointer;
+  }
+
+  .faq__answer {
+    display: grid;
+    gap: var(--space-2);
+    padding: 0 var(--space-5) var(--space-5);
+  }
+
+  .location {
+    display: grid;
+    gap: var(--space-7);
+  }
+
+  @media (min-width: 768px) {
+    .location {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+
+  .location__address {
+    margin-bottom: var(--space-3);
+    font-weight: 700;
+  }
+
+  .channels {
+    display: grid;
+    gap: var(--space-3);
+    padding: 0;
+    list-style: none;
+  }
+
+  .channel {
+    display: grid;
+    justify-items: start;
+    padding: var(--space-4);
+    border: 1px solid var(--color-line);
+    border-radius: var(--radius);
+    background: #fff;
+    color: var(--color-ink);
+    text-decoration: none;
+  }
+
+  .site-footer {
+    padding-block: var(--space-7) 120px;
+    background: var(--color-ink);
+    color: #d6d7da;
+    font-size: var(--text-sm);
+  }
+
+  .site-footer__name {
+    margin-bottom: var(--space-3);
+    color: #fff;
+    font-size: var(--text-lg);
+    font-weight: 800;
+  }
+
+  .site-footer__info {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-1) var(--space-5);
+  }
+
+  .site-footer__info > div {
+    display: flex;
+    gap: var(--space-2);
+  }
+
+  .site-footer__info dt {
+    color: #9a9da3;
+  }
+
+  .site-footer__disclaimer {
+    margin-top: var(--space-4);
+    color: #9a9da3;
+  }
+
+  .schema-view summary {
+    color: var(--color-note);
+    font-weight: 700;
+    cursor: pointer;
+  }
+
+  .schema-view pre {
+    max-height: 360px;
+    margin-top: var(--space-3);
+    padding: var(--space-4);
+    overflow: auto;
+    border-radius: var(--radius);
+    background: #fff;
+    font-size: 0.75rem;
+    line-height: 1.5;
+    white-space: pre-wrap;
+    word-break: break-all;
+  }
+</style>

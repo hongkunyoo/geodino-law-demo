@@ -1,0 +1,92 @@
+---
+/**
+ * GeoDino 목소리로 쓰는 예시 자료 페이지의 공통 틀 (사무소 사이트와 구분되도록 GeoDino 초록을 쓴다)
+ */
+import Layout from '@/layouts/Layout.astro';
+
+export interface Props {
+  title: string;
+  description: string;
+  eyebrow: string;
+}
+
+const { title, description, eyebrow } = Astro.props;
+---
+
+<Layout title={`${title} (예시) | GeoDino`} description={description}>
+  <main id="main" class="demo-page">
+    <div class="container">
+      <header class="demo-page__header">
+        <p class="demo-page__eyebrow">{eyebrow}</p>
+        <h1>{title}</h1>
+        <p class="demo-page__badge">예시 화면 · 가상 사무소 기준이며 실제 AI 답변을 기록한 것이 아닙니다</p>
+      </header>
+      <slot />
+      <footer class="demo-page__footer">
+        <a class="demo-page__cta" href="https://geodino.io/contact/">우리 사무소도 무료 AI 노출 진단 받아 보기</a>
+        <p>GeoDino · help@geodino.io</p>
+      </footer>
+    </div>
+  </main>
+</Layout>
+
+<style>
+  .demo-page {
+    --color-primary: var(--color-note);
+    padding-block: var(--space-7) var(--space-8);
+  }
+
+  .demo-page__header {
+    margin-bottom: var(--space-7);
+  }
+
+  .demo-page__eyebrow {
+    color: var(--color-note);
+    font-weight: 700;
+  }
+
+  .demo-page__badge {
+    display: inline-block;
+    margin-top: var(--space-3);
+    padding: var(--space-1) var(--space-3);
+    border-radius: 6px;
+    background: #fff4d6;
+    color: #6b4e00;
+    font-size: var(--text-sm);
+    font-weight: 600;
+  }
+
+  .demo-page__footer {
+    display: grid;
+    justify-items: start;
+    gap: var(--space-3);
+    margin-top: var(--space-8);
+    padding-top: var(--space-6);
+    border-top: 1px solid var(--color-line);
+    color: var(--color-ink-muted);
+    font-size: var(--text-sm);
+  }
+
+  .demo-page__cta {
+    padding: 12px 24px;
+    border-radius: 999px;
+    background: var(--color-note);
+    color: #fff;
+    font-size: var(--text-base);
+    font-weight: 700;
+    text-decoration: none;
+  }
+
+  .demo-page :global(h2) {
+    margin-top: var(--space-7);
+    margin-bottom: var(--space-4);
+    font-size: var(--text-xl);
+  }
+
+  .demo-page :global(.card) {
+    padding: var(--space-5);
+    border: 1px solid var(--color-line);
+    border-radius: var(--radius);
+    background: #fff;
+  }
+</style>
