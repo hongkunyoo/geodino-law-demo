@@ -12,6 +12,7 @@ const current = Astro.url.pathname;
   <div class="container demo-bar__inner">
     <p class="demo-bar__text">
       <strong>예시 사이트</strong>입니다. 실제 법률사무소가 아니며, 이름·주소·연락처는 모두 가상입니다.
+      <span class="demo-bar__review">구체적인 문구와 사이트 분위기 및 색상은 고객님의 검토를 거쳐 최종 결정합니다.</span>
     </p>
     <nav class="demo-bar__nav" aria-label="예시 자료">
       {
@@ -40,6 +41,11 @@ const current = Astro.url.pathname;
     justify-content: space-between;
     gap: var(--space-1) var(--space-4);
     padding-block: var(--space-2);
+  }
+
+  .demo-bar__review {
+    display: block;
+    opacity: 0.85;
   }
 
   .demo-bar__nav {
