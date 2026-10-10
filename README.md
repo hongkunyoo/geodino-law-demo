@@ -12,7 +12,7 @@ GeoDino가 고객 사무소에 만들어 드리는 "공식 안내 페이지"의 
 | `src/config/office.ts` | 사무소 정보 전부 (이 파일만 바꾸면 다른 사무소 페이지가 됨) |
 | `src/config/ai-notes.ts` | "AI가 읽는 부분 보기" 설명 (예시 전용) |
 | `src/pages/index.astro` | 공식 안내 페이지 (한 페이지) |
-| `src/pages/[demo].astro` | 예시 자료: `/sample-report/`, `/before-after/` (예시 전용) |
+| `src/pages/[demo].astro` | 예시 자료: `/before-after/`, `/sample-report/` (예시 전용. 진단 요약은 구성 확정 전이라 링크 없이 주소로만 접근) |
 | `src/lib/schema.ts` | 구조화 데이터 (LegalService, Person, FAQPage) |
 
 ## 실제 고객 사이트로 쓸 때
